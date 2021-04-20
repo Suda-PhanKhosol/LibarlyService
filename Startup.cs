@@ -18,6 +18,7 @@ using NetCoreAPI_Template_v3_with_auth.Helpers;
 using NetCoreAPI_Template_v3_with_auth.Services;
 using NetCoreAPI_Template_v3_with_auth.Services.Admin;
 using NetCoreAPI_Template_v3_with_auth.Services.Book;
+using NetCoreAPI_Template_v3_with_auth.Services.BorrowBook;
 using NetCoreAPI_Template_v3_with_auth.Services.CategoryBook;
 using NetCoreAPI_Template_v3_with_auth.Services.Customer;
 using Newtonsoft.Json;
@@ -96,6 +97,8 @@ namespace NetCoreAPI_Template_v3_with_auth
                   services.AddScoped<ICategoryBook, CategoryBookService>();
                   services.AddScoped<ICustomer, CustomerService>();
                   services.AddScoped<IBook, BookService>();
+                  services.AddScoped<IBorrowBook, BorrowBookService>();
+
 
 
 

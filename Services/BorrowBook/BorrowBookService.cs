@@ -8,6 +8,9 @@ using Microsoft.Extensions.Logging;
 using NetCoreAPI_Template_v3_with_auth.Data;
 using NetCoreAPI_Template_v3_with_auth.DTOs.BorrowBook;
 using NetCoreAPI_Template_v3_with_auth.Models;
+using mBorrowBook = NetCoreAPI_Template_v3_with_auth.Models.BorrowBook;
+
+
 
 namespace NetCoreAPI_Template_v3_with_auth.Services.BorrowBook
 {
@@ -27,9 +30,27 @@ namespace NetCoreAPI_Template_v3_with_auth.Services.BorrowBook
                   this._httpContext = httpContext;
             }
 
-            public Task<ServiceResponse<BorrowBookDTO_ToReturn>> CreateBorrowBook(BorrowBookDTO_ToCreate AddBorrowBook)
+            public async Task<ServiceResponse<BorrowBookDTO_ToReturn>> CreateBorrowBook(BorrowBookDTO_ToCreate AddBorrowBook)
             {
-                  throw new System.NotImplementedException();
+                  var newBorrow = new mBorrowBook();
+                  var book = await _dbContext.Books.FirstOrDefaultAsync(x => x.Id == AddBorrowBook.BookId);
+                  newBorrow.BookId = AddBorrowBook.BookId;
+                  newBorrow.CustomerId = AddBorrowBook.CustomerId;
+                  newBorrow.AdminId = AddBorrowBook.AdminId;
+                  newBorrow.RecieveDate = AddBorrowBook.RecieveDate;
+                  newBorrow.DueDate = AddBorrowBook.RecieveDate.AddDays(book.BorrowDay);// newBorrow.RecieveDate.AddDays(book.BorrowDay); ;
+
+                  // ใช้ตอน Edit Update newBorrow.ReturnDate = AddBorrowBook.ReturnDate;
+                  newBorrow.TotalLatePrice = 0;
+                  newBorrow.TotalPrice = book.BorrowPrice * book.BorrowDay;
+                  newBorrow.TotalAmount = newBorrow.TotalPrice;
+
+                  await _dbContext.AddAsync(newBorrow);
+                  await _dbContext.SaveChangesAsync();
+                  var lastData = await _dbContext.BorrowBooks.MaxAsync(x => x.Id);
+                  var result = await _dbContext.BorrowBooks.Include(x => x.Books).ThenInclude(x => x.CategoryBooks).Include(x => x.Customers).Where(x => x.Id == lastData).FirstOrDefaultAsync();
+
+                  return ResponseResult.Success(_mapper.Map<BorrowBookDTO_ToReturn>(result));
             }
 
 
@@ -52,7 +73,7 @@ namespace NetCoreAPI_Template_v3_with_auth.Services.BorrowBook
             public async Task<ServiceResponse<BorrowBookDTO_ToReturn>> UpdateBorrowBook(BorrowBookDTO_ToUpdate UpdateBorrowBook, int id)
             {
                   var oldDataBorrowBook = await _dbContext.BorrowBooks.FirstOrDefaultAsync(x => x.Id == id);
-                  var book = _dbContext.Books.FirstOrDefault(x => x.Id == oldDataBorrowBook.BookId);
+                  var book = await _dbContext.Books.FirstOrDefaultAsync(x => x.Id == oldDataBorrowBook.BookId);
 
                   if (UpdateBorrowBook.ReturnDate > oldDataBorrowBook.DueDate)
                   {
@@ -71,7 +92,7 @@ namespace NetCoreAPI_Template_v3_with_auth.Services.BorrowBook
                         oldDataBorrowBook.TotalAmount = oldDataBorrowBook.TotalPrice + oldDataBorrowBook.TotalLatePrice;
 
                   }
-                  var borrowBook = _dbContext.BorrowBooks.Include(x => x.Books).ThenInclude(x => x.CategoryBooks).Include(x => x.Customers).Where(x => x.Id == oldDataBorrowBook.Id).FirstOrDefault();
+                  var borrowBook = await _dbContext.BorrowBooks.Include(x => x.Books).ThenInclude(x => x.CategoryBooks).Include(x => x.Customers).Where(x => x.Id == oldDataBorrowBook.Id).FirstOrDefaultAsync();
 
                   return ResponseResult.Success(_mapper.Map<BorrowBookDTO_ToReturn>(borrowBook));
 
@@ -85,5 +106,53 @@ namespace NetCoreAPI_Template_v3_with_auth.Services.BorrowBook
                   return ResponseResult.Success(_mapper.Map<List<BorrowBookDTO_ToReturn>>(_dbContext.BorrowBooks.ToList()));
 
             }
+
+            public async Task<ServiceResponse<BorrowBookDTO_ToReturn>> ReNewBorrowBook(BorrowBookDTO_ToReNew ReNewBorrowBook, int id)
+            {
+                  var oldDataBorrowBook = await _dbContext.BorrowBooks.FirstOrDefaultAsync(x => x.Id == id);
+                  var book = await _dbContext.Books.FirstOrDefaultAsync(x => x.Id == oldDataBorrowBook.BookId);
+
+                  int newDate = ReNewBorrowBook.RecieveDate.Day - oldDataBorrowBook.RecieveDate.Day;
+
+
+                  oldDataBorrowBook.AdminId = ReNewBorrowBook.AdminId;
+                  oldDataBorrowBook.RecieveDate = ReNewBorrowBook.RecieveDate;
+                  oldDataBorrowBook.DueDate = ReNewBorrowBook.RecieveDate.AddDays(book.BorrowDay);
+                  oldDataBorrowBook.TotalLatePrice = 0;
+                  oldDataBorrowBook.TotalPrice = (book.BorrowPrice * book.BorrowDay) + (book.BorrowPrice * newDate);
+
+
+                  oldDataBorrowBook.TotalAmount = oldDataBorrowBook.TotalPrice;
+                  await _dbContext.SaveChangesAsync();
+
+                  return ResponseResult.Success(
+                        _mapper.Map<BorrowBookDTO_ToReturn>
+                        (
+                         _dbContext.BorrowBooks.Include(x => x.Books).ThenInclude(x => x.CategoryBooks)
+                        .Include(x => x.Customers)
+                        .Where(x => x.Id == oldDataBorrowBook.Id)
+                        .FirstOrDefault()
+                        )
+                  );
+
+            }
+
+            public async Task<ServiceResponse<List<BorrowBookDTO_ToReturn>>> SearchBorrowByCustomer(string cusName)
+            {
+                  var borrowBook = await _dbContext.BorrowBooks.Include(x => x.Books).ThenInclude(x => x.CategoryBooks)
+                       .Include(x => x.Customers)
+                       .Where(x => x.Customers.Name.ToUpper().Contains(cusName.ToUpper())).ToListAsync();
+                  return ResponseResult.Success(_mapper.Map<List<BorrowBookDTO_ToReturn>>(borrowBook));
+
+            }
+
+            public async Task<ServiceResponse<List<BorrowBookDTO_ToReturn>>> SearchBorrowByBook(string bookName)
+            {
+                  var borrowBook = await _dbContext.BorrowBooks.Include(x => x.Books).ThenInclude(x => x.CategoryBooks)
+                      .Include(x => x.Customers)
+                      .Where(x => x.Books.Name.ToUpper().Contains(bookName.ToUpper())).ToListAsync();
+                  return ResponseResult.Success(_mapper.Map<List<BorrowBookDTO_ToReturn>>(borrowBook));
+            }
+
       }
 }

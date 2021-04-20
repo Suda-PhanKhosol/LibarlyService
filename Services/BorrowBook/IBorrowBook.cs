@@ -12,5 +12,12 @@ namespace NetCoreAPI_Template_v3_with_auth.Services.BorrowBook
             Task<ServiceResponse<BorrowBookDTO_ToReturn>> GetBorrowBookById(int Id);
             Task<ServiceResponse<BorrowBookDTO_ToReturn>> UpdateBorrowBook(BorrowBookDTO_ToUpdate UpdateBorrowBook, int id);
             Task<ServiceResponse<List<BorrowBookDTO_ToReturn>>> DeleteBorrowBookById(int Id);
+            Task<ServiceResponse<BorrowBookDTO_ToReturn>> ReNewBorrowBook(BorrowBookDTO_ToReNew ReNewBorrowBook, int id);
+            Task<ServiceResponse<List<BorrowBookDTO_ToReturn>>> SearchBorrowByCustomer(string cusName);
+            Task<ServiceResponse<List<BorrowBookDTO_ToReturn>>> SearchBorrowByBook(string bookName);
+
+
+
+
       }
 }

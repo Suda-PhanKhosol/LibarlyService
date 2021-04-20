@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "vxSeHA4pDJNUPiBSjRCD2FAg3H9omwIpl0DQP/S2Y7rYVUadL0O6LRHD/Q8b3MAk9qObOFOqPDkGWoQXeuL+yQ==",
+  "dgSpecHash": "shrKfOiBQxUmpGVyBgPqAwKy3Ppt9ngRMgC062iTlRzWUrAo7l+ljzZkNMrwWlMlgrMXPsIOleMkE7CKJWWsqg==",
   "success": true,
-  "projectFilePath": "D:\\Training\\TestProject\\NetCoreAPI_Template_v3_with_auth\\NetCoreAPI_Template_v3_with_auth\\NetCoreAPI_Template_v3_with_auth.csproj",
+  "projectFilePath": "D:\\Training\\TestProject\\GitLibary\\NetCoreAPI_Template_v3_with_auth.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\admin\\.nuget\\packages\\automapper\\10.1.0\\automapper.10.1.0.nupkg.sha512",
     "C:\\Users\\admin\\.nuget\\packages\\automapper.extensions.microsoft.dependencyinjection\\8.1.0\\automapper.extensions.microsoft.dependencyinjection.8.1.0.nupkg.sha512",

@@ -1,125 +1,69 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NetCoreAPI_Template_v3_with_auth.Data;
 using NetCoreAPI_Template_v3_with_auth.DTOs.BorrowBook;
 using NetCoreAPI_Template_v3_with_auth.Models;
+using NetCoreAPI_Template_v3_with_auth.Services.BorrowBook;
 
 namespace NetCoreAPI_Template_v3_with_auth.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class BorrowBookController : ControllerBase
-    {
-        private readonly IMapper _mapper;
-        private readonly AppDBContext _db;
+      [ApiController]
+      [Route("api/[controller]")]
+      public class BorrowBookController : ControllerBase
+      {
+            private readonly IBorrowBook _borrowBookService;
 
-        public BorrowBookController(IMapper mapper, AppDBContext db)
-        {
-            this._mapper = mapper;
-            this._db = db;
-        }
-
-        [HttpPost("AddBorrowBook")]
-        public IActionResult AddBorrowBook(BorrowBookDTO_ToCreate AddBorrowBook)
-        {
-            var newBorrow = new BorrowBook();
-            var book = _db.Books.FirstOrDefault(x => x.Id == AddBorrowBook.BookId);
-            newBorrow.BookId = AddBorrowBook.BookId;
-            newBorrow.CustomerId = AddBorrowBook.CustomerId;
-            newBorrow.AdminId = AddBorrowBook.AdminId;
-            newBorrow.RecieveDate = AddBorrowBook.RecieveDate;
-            newBorrow.DueDate = AddBorrowBook.RecieveDate.AddDays(book.BorrowDay);// newBorrow.RecieveDate.AddDays(book.BorrowDay); ;
-
-            // ใช้ตอน Edit Update newBorrow.ReturnDate = AddBorrowBook.ReturnDate;
-            newBorrow.TotalLatePrice = 0;
-            newBorrow.TotalPrice = book.BorrowPrice * book.BorrowDay;
-            newBorrow.TotalAmount = newBorrow.TotalPrice;
-
-            _db.Add(newBorrow);
-            _db.SaveChanges();
-            var lastData = _db.BorrowBooks.Max(x => x.Id);
-            var result = _db.BorrowBooks.Include(x => x.Books).ThenInclude(x => x.CategoryBooks).Include(x => x.Customers).Where(x => x.Id == lastData).FirstOrDefault();
-
-            return Ok(_mapper.Map<BorrowBookDTO_ToReturn>(result));
-
-
-        }
-
-        [HttpGet("GetAllBorrowBook")]
-        public IActionResult GetAllBorrowBook()
-        {
-            var getBorrowBook = _db.BorrowBooks
-            .Include(x => x.Books)
-            .ThenInclude(x => x.CategoryBooks)
-            .Include(x => x.Customers)
-            .ToList();
-
-            return Ok(_mapper.Map<List<BorrowBookDTO_ToReturn>>(getBorrowBook));
-        }
-
-        [HttpGet("SearchBorrowByCustomer/{cusName}")]
-        public IActionResult SearchBorrowByCustomer(string cusName)
-        {
-            return Ok(_mapper.Map<List<BorrowBookDTO_ToReturn>>(_db.BorrowBooks.Include(x => x.Books).ThenInclude(x => x.CategoryBooks).Include(x => x.Customers).Where(x => x.Customers.Name.Contains(cusName)).ToList()));
-        }
-
-        [HttpGet("SearchBorrowByBook/{bookName}")]
-        public IActionResult SearchBorrowByBook(string bookName)
-        {
-            return Ok(_mapper.Map<List<BorrowBookDTO_ToReturn>>(_db.BorrowBooks.Include(x => x.Books).ThenInclude(x => x.CategoryBooks).Include(x => x.Customers).Where(x => x.Books.Name.Contains(bookName)).ToList()));
-        }
-
-        [HttpPut("UpdateBorrowBook/{id}")]
-        public IActionResult UpdateBorrowBook(BorrowBookDTO_ToUpdate UpdateBorrowBook, int id)
-        {
-            var oldDataBorrowBook = _db.BorrowBooks.FirstOrDefault(x => x.Id == id);
-            var book = _db.Books.FirstOrDefault(x => x.Id == oldDataBorrowBook.BookId);
-
-            if (UpdateBorrowBook.ReturnDate > oldDataBorrowBook.DueDate)
+            public BorrowBookController(IBorrowBook borrowBookService)
             {
-                int lateDate = UpdateBorrowBook.ReturnDate.Day - oldDataBorrowBook.DueDate.Day;
-
-                oldDataBorrowBook.TotalLatePrice = lateDate * book.LatePrice;
-                oldDataBorrowBook.ReturnDate = UpdateBorrowBook.ReturnDate;
-                oldDataBorrowBook.AdminId = UpdateBorrowBook.AdminId;
-                oldDataBorrowBook.TotalAmount = oldDataBorrowBook.TotalPrice + oldDataBorrowBook.TotalLatePrice;
-
+                  this._borrowBookService = borrowBookService;
             }
-            else
+
+            [HttpPost("AddBorrowBook")]
+            public async Task<IActionResult> AddBorrowBook(BorrowBookDTO_ToCreate AddBorrowBook)
             {
-                oldDataBorrowBook.ReturnDate = UpdateBorrowBook.ReturnDate;
-                oldDataBorrowBook.AdminId = UpdateBorrowBook.AdminId;
-                oldDataBorrowBook.TotalAmount = oldDataBorrowBook.TotalPrice + oldDataBorrowBook.TotalLatePrice;
-
+                  return Ok(await _borrowBookService.CreateBorrowBook(AddBorrowBook));
             }
-            return Ok(_db.BorrowBooks.Include(x => x.Books).ThenInclude(x => x.CategoryBooks).Include(x => x.Customers).Where(x => x.Id == oldDataBorrowBook.Id).FirstOrDefault());
-        }
 
-        [HttpPut("ReNewBorrowBook/{id}")]
-        public IActionResult ReNewBorrowBook(BorrowBookDTO_ToReNew ReNewBorrowBook, int id)
-        {
-            var oldDataBorrowBook = _db.BorrowBooks.FirstOrDefault(x => x.Id == id);
-            var book = _db.Books.FirstOrDefault(x => x.Id == oldDataBorrowBook.BookId);
+            [HttpGet("GetAllBorrowBook")]
+            public async Task<IActionResult> GetAllBorrowBook()
+            {
+                  return Ok(await _borrowBookService.GetAllBorrowBook());
+            }
 
-            int newDate = ReNewBorrowBook.RecieveDate.Day - oldDataBorrowBook.RecieveDate.Day;
+            [HttpGet("SearchBorrowByCustomer/{cusName}")]
+            public async Task<IActionResult> SearchBorrowByCustomer(string cusName)
+            {
+                  return Ok(await _borrowBookService.SearchBorrowByCustomer(cusName));
+            }
 
+            [HttpGet("SearchBorrowByBook/{bookName}")]
+            public async Task<IActionResult> SearchBorrowByBook(string bookName)
+            {
+                  return Ok(await _borrowBookService.SearchBorrowByBook(bookName));
+            }
 
-            oldDataBorrowBook.AdminId = ReNewBorrowBook.AdminId;
-            oldDataBorrowBook.RecieveDate = ReNewBorrowBook.RecieveDate;
-            oldDataBorrowBook.DueDate = ReNewBorrowBook.RecieveDate.AddDays(book.BorrowDay);
-            oldDataBorrowBook.TotalLatePrice = 0;
-            oldDataBorrowBook.TotalPrice = (book.BorrowPrice * book.BorrowDay) + (book.BorrowPrice * newDate);
+            [HttpPut("UpdateBorrowBook/{id}")]
+            public async Task<IActionResult> UpdateBorrowBook(BorrowBookDTO_ToUpdate UpdateBorrowBook, int id)
+            {
+                  return Ok(await _borrowBookService.UpdateBorrowBook(UpdateBorrowBook, id));
+            }
 
+            [HttpPut("ReNewBorrowBook/{id}")]
+            public async Task<IActionResult> ReNewBorrowBook(BorrowBookDTO_ToReNew ReNewBorrowBook, int id)
+            {
+                  return Ok(await _borrowBookService.ReNewBorrowBook(ReNewBorrowBook, id));
+            }
 
-            oldDataBorrowBook.TotalAmount = oldDataBorrowBook.TotalPrice;
-            _db.SaveChanges();
+            [HttpPut("DeleteBorrowBookById/{id}")]
+            public async Task<IActionResult> DeleteBorrowBookById(int id)
+            {
+                  return Ok(await _borrowBookService.DeleteBorrowBookById(id));
+            }
 
-            return Ok(_db.BorrowBooks.Include(x => x.Books).ThenInclude(x => x.CategoryBooks).Include(x => x.Customers).Where(x => x.Id == oldDataBorrowBook.Id).FirstOrDefault());
-        }
-
-    }
+      }
 }

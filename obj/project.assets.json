@@ -7148,11 +7148,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Training\\TestProject\\NetCoreAPI_Template_v3_with_auth\\NetCoreAPI_Template_v3_with_auth\\NetCoreAPI_Template_v3_with_auth.csproj",
+      "projectUniqueName": "D:\\Training\\TestProject\\GitLibary\\NetCoreAPI_Template_v3_with_auth.csproj",
       "projectName": "NetCoreAPI_Template_v3_with_auth",
-      "projectPath": "D:\\Training\\TestProject\\NetCoreAPI_Template_v3_with_auth\\NetCoreAPI_Template_v3_with_auth\\NetCoreAPI_Template_v3_with_auth.csproj",
+      "projectPath": "D:\\Training\\TestProject\\GitLibary\\NetCoreAPI_Template_v3_with_auth.csproj",
       "packagesPath": "C:\\Users\\admin\\.nuget\\packages\\",
-      "outputPath": "D:\\Training\\TestProject\\NetCoreAPI_Template_v3_with_auth\\NetCoreAPI_Template_v3_with_auth\\obj\\",
+      "outputPath": "D:\\Training\\TestProject\\GitLibary\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\admin\\AppData\\Roaming\\NuGet\\NuGet.Config"
