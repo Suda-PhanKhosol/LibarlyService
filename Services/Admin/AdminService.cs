@@ -40,7 +40,7 @@ namespace NetCoreAPI_Template_v3_with_auth.Services.Admin
                   newAdmin.Name = CreateAdmin.Name;
                   newAdmin.MobilePhone = CreateAdmin.MobilePhone;
                   newAdmin.Email = CreateAdmin.Email;
-                  _dbContext.Add(newAdmin);
+                  _dbContext.Admins.Add(newAdmin);
                   await _dbContext.SaveChangesAsync();
                   var dto = _mapper.Map<AdminDTO_ToReturn>(newAdmin);
                   //return for 
@@ -68,40 +68,26 @@ namespace NetCoreAPI_Template_v3_with_auth.Services.Admin
 
             public async Task<ServiceResponse<AdminDTO_ToReturn>> UpdateAdmin(AdminDTO_ToUpdate UpdateAdmin, int id)
             {
-                  var oldAdminData = _dbContext.Admins.FirstOrDefault(x => x.Id == id);
+                  var oldAdminData = await _dbContext.Admins.FirstOrDefaultAsync(x => x.Id == id);
                   if (oldAdminData.Name != UpdateAdmin.Name || oldAdminData.MobilePhone != UpdateAdmin.MobilePhone || oldAdminData.Email != UpdateAdmin.Email)
                   {
                         oldAdminData.Name = UpdateAdmin.Name;
                         oldAdminData.MobilePhone = UpdateAdmin.MobilePhone;
                         oldAdminData.Email = UpdateAdmin.Email;
-                        _dbContext.SaveChangesAsync();
+                        await _dbContext.SaveChangesAsync();
                   }
                   return ResponseResult.Success(_mapper.Map<AdminDTO_ToReturn>(oldAdminData));
             }
             public async Task<ServiceResponse<List<AdminDTO_ToReturn>>> DeleteAdminById(int id)
             {
-                  //ทำไมใช้   var findAdmin = _dbContext.Admins.FirstOrDefaultAsync(x => x.Id == id); ไม่ได 
-                  var findAdmin = _dbContext.Admins.Where(x => x.Id == id).FirstOrDefault();
+                  var findAdmin = await _dbContext.Admins.FirstOrDefaultAsync(x => x.Id == id);
 
                   _dbContext.Remove(findAdmin);
                   await _dbContext.SaveChangesAsync();
-                  var admin = _dbContext.Admins.AsNoTracking().ToListAsync();
+                  var admin = _dbContext.Admins.ToList();
                   return ResponseResult.Success(_mapper.Map<List<AdminDTO_ToReturn>>(admin));
 
-                  //   try
-                  //   {
-                  //         //ทำไมใช้   var findAdmin = _dbContext.Admins.FirstOrDefaultAsync(x => x.Id == id); ไม่ได 
-                  //         var findAdmin = _dbContext.Admins.Where(x => x.Id == id).FirstOrDefault();
 
-                  //         _dbContext.Remove(findAdmin);
-                  //         await _dbContext.SaveChangesAsync();
-                  //         var admin = _dbContext.Admins.AsNoTracking().ToListAsync();
-                  //         return ResponseResult.Success(_mapper.Map<List<AdminDTO_ToReturn>>(admin));
-                  //   }
-                  //   catch (ArgumentNullException ex)
-                  //   {
-                  //         return ResponseResult.Failure(ex.Message);
-                  //   }
 
             }
       }

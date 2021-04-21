@@ -61,22 +61,32 @@ namespace NetCoreAPI_Template_v3_with_auth.Services.Book
             public async Task<ServiceResponse<BookDTO_ToReturn>> UpdateBook(BookDTO_ToUpdate UpdateBook, int id)
             {
                   var oldBookData = _dbContext.Books.FirstOrDefault(x => x.Id == id);
-                  if (oldBookData.Name != UpdateBook.Name ||
-                  oldBookData.Writter != UpdateBook.Writter ||
-                  oldBookData.BorrowDay != UpdateBook.BorrowDay ||
-                  oldBookData.BorrowPrice != UpdateBook.BorrowPrice ||
-                  oldBookData.LatePrice != UpdateBook.LatePrice ||
-                  oldBookData.CategoryBookId != UpdateBook.CategoryBookId)
+                  var cateGoryBookCheck = _dbContext.CategoryBooks.FirstOrDefault(x => x.Id == UpdateBook.CategoryBookId);
+                  if (cateGoryBookCheck == null)
                   {
-                        oldBookData.Name = UpdateBook.Name;
-                        oldBookData.Writter = UpdateBook.Writter;
-                        oldBookData.BorrowDay = UpdateBook.BorrowDay;
-                        oldBookData.BorrowPrice = UpdateBook.BorrowPrice;
-                        oldBookData.LatePrice = UpdateBook.LatePrice;
-                        oldBookData.CategoryBookId = UpdateBook.CategoryBookId;
-                        await _dbContext.SaveChangesAsync();
+                        return ResponseResult.Failure<BookDTO_ToReturn>("CategoryBook id not found");
+
                   }
-                  return ResponseResult.Success(_mapper.Map<BookDTO_ToReturn>(oldBookData));
+                  else
+                  {
+                        if (oldBookData.Name != UpdateBook.Name ||
+                        oldBookData.Writter != UpdateBook.Writter ||
+                        oldBookData.BorrowDay != UpdateBook.BorrowDay ||
+                        oldBookData.BorrowPrice != UpdateBook.BorrowPrice ||
+                        oldBookData.LatePrice != UpdateBook.LatePrice ||
+                        oldBookData.CategoryBookId != UpdateBook.CategoryBookId)
+                        {
+                              oldBookData.Name = UpdateBook.Name;
+                              oldBookData.Writter = UpdateBook.Writter;
+                              oldBookData.BorrowDay = UpdateBook.BorrowDay;
+                              oldBookData.BorrowPrice = UpdateBook.BorrowPrice;
+                              oldBookData.LatePrice = UpdateBook.LatePrice;
+                              //check categoryBook
+                              oldBookData.CategoryBookId = UpdateBook.CategoryBookId;
+                              await _dbContext.SaveChangesAsync();
+                        }
+                        return ResponseResult.Success(_mapper.Map<BookDTO_ToReturn>(oldBookData));
+                  }
             }
 
             public async Task<ServiceResponse<List<BookDTO_ToReturn>>> DeleteBookrById(int Id)

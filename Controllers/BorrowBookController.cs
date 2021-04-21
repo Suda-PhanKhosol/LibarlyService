@@ -59,7 +59,7 @@ namespace NetCoreAPI_Template_v3_with_auth.Controllers
                   return Ok(await _borrowBookService.ReNewBorrowBook(ReNewBorrowBook, id));
             }
 
-            [HttpPut("DeleteBorrowBookById/{id}")]
+            [HttpDelete("DeleteBorrowBookById/{id}")]
             public async Task<IActionResult> DeleteBorrowBookById(int id)
             {
                   return Ok(await _borrowBookService.DeleteBorrowBookById(id));

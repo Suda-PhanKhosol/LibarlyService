@@ -14,31 +14,31 @@ using System.Threading.Tasks;
 
 namespace NetCoreAPI_Template_v3_with_auth
 {
-    public class AutoMapperProfile : Profile
-    {
-        public AutoMapperProfile()
-        {
-            CreateMap<User, UserDto>();
-            CreateMap<Role, RoleDto>()
-                .ForMember(x => x.RoleName, x => x.MapFrom(x => x.Name));
-            CreateMap<RoleDtoAdd, Role>()
-                .ForMember(x => x.Name, x => x.MapFrom(x => x.RoleName)); ;
-            CreateMap<UserRole, UserRoleDto>();
+      public class AutoMapperProfile : Profile
+      {
+            public AutoMapperProfile()
+            {
+                  CreateMap<User, UserDto>();
+                  CreateMap<Role, RoleDto>()
+                      .ForMember(x => x.RoleName, x => x.MapFrom(x => x.Name));
+                  CreateMap<RoleDtoAdd, Role>()
+                      .ForMember(x => x.Name, x => x.MapFrom(x => x.RoleName)); ;
+                  CreateMap<UserRole, UserRoleDto>();
 
 
-            CreateMap<Admin, AdminDTO_ToReturn>().ReverseMap();
-            CreateMap<Customer, CustomerDTO_ToRetun>().ReverseMap();
-            CreateMap<CategoryBook, CategoryBookDTO_ToReturn>().ReverseMap();
-            CreateMap<Book, BookDTO_ToReturn>().ReverseMap();
-            CreateMap<Book, BorrowBookDTO_ToReturn>().ReverseMap();
-            CreateMap<BorrowBook, BorrowBookDTO_ToReturn>().ReverseMap();
-
-
-
+                  CreateMap<Admin, AdminDTO_ToReturn>().ReverseMap();
+                  CreateMap<Customer, CustomerDTO_ToRetun>().ReverseMap();
+                  CreateMap<CategoryBook, CategoryBookDTO_ToReturn>().ReverseMap();
+                  CreateMap<Book, BookDTO_ToReturn>().ReverseMap();
+                  CreateMap<Book, BorrowBookDTO_ToReturn>().ReverseMap();
+                  CreateMap<BorrowBook, BorrowBookDTO_ToReturn>().ReverseMap();
 
 
 
 
-        }
-    }
+
+
+
+            }
+      }
 }
