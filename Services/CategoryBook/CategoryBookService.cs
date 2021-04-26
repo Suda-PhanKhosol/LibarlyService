@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using GitLibary.DTOs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -9,6 +10,9 @@ using NetCoreAPI_Template_v3_with_auth.Data;
 using NetCoreAPI_Template_v3_with_auth.DTOs.CategoryBook;
 using NetCoreAPI_Template_v3_with_auth.Models;
 using mCategoryBook = NetCoreAPI_Template_v3_with_auth.Models.CategoryBook;
+using System.Linq.Dynamic.Core;
+using NetCoreAPI_Template_v3_with_auth.Helpers;
+
 namespace NetCoreAPI_Template_v3_with_auth.Services.CategoryBook
 {
       public class CategoryBookService : ServiceBase, ICategoryBook
@@ -66,6 +70,39 @@ namespace NetCoreAPI_Template_v3_with_auth.Services.CategoryBook
                   _dbContext.Remove(_dbContext.CategoryBooks.FirstOrDefault(x => x.Id == id));
                   await _dbContext.SaveChangesAsync();
                   return ResponseResult.Success(_mapper.Map<List<CategoryBookDTO_ToReturn>>(_dbContext.CategoryBooks.ToList()));
+            }
+
+            public async Task<ServiceResponseWithPagination<List<CategoryBookDTO_ToReturn>>> SearchPaginate(CategoryBookDTO_Filter filter)
+            {
+                  //สามารถคิวรี่ได้ ปั้นตัวคิวรี่โดยยังไม่แตะดาต้าเบส excute 2 รอบ
+                  var categoryBook = _dbContext.CategoryBooks.AsQueryable();
+                  if (!string.IsNullOrWhiteSpace(filter.Name))
+                  {
+                        categoryBook = categoryBook.Where(x => (x.CodeType).Contains(filter.Name));
+                  }
+
+                  // 2. Order => Order by
+                  if (!string.IsNullOrWhiteSpace(filter.OrderingField))
+                  {
+                        try
+                        {
+                              categoryBook = categoryBook.OrderBy($"{filter.OrderingField} {(filter.AscendingOrder ? "ascending" : "descending")}");
+                        }
+                        catch
+                        {
+                              return ResponseResultWithPagination.Failure<List<CategoryBookDTO_ToReturn>>($"Could not order by field: {filter.OrderingField}");
+                        }
+                  }
+
+                  // 3. Add Paginate => Page,total,Perpage
+                  var paginationResult = await _httpContext.HttpContext.InsertPaginationParametersInResponse(categoryBook, filter.RecordsPerPage, filter.Page);
+
+                  // 4. Execute Query
+                  var category = await categoryBook.Paginate(filter).ToListAsync();
+
+                  // 5. Return result
+                  var result = _mapper.Map<List<CategoryBookDTO_ToReturn>>(category);
+                  return ResponseResultWithPagination.Success(result, paginationResult);
             }
       }
 }

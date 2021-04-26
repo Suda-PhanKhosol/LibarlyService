@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using GitLibary.DTOs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -10,7 +11,8 @@ using NetCoreAPI_Template_v3_with_auth.DTOs.BorrowBook;
 using NetCoreAPI_Template_v3_with_auth.Models;
 using mBorrowBook = NetCoreAPI_Template_v3_with_auth.Models.BorrowBook;
 
-
+using System.Linq.Dynamic.Core;
+using NetCoreAPI_Template_v3_with_auth.Helpers;
 
 namespace NetCoreAPI_Template_v3_with_auth.Services.BorrowBook
 {
@@ -154,5 +156,39 @@ namespace NetCoreAPI_Template_v3_with_auth.Services.BorrowBook
                   return ResponseResult.Success(_mapper.Map<List<BorrowBookDTO_ToReturn>>(borrowBook));
             }
 
+            public async Task<ServiceResponseWithPagination<List<BorrowBookDTO_ToReturn>>> SearchPagination(BorrowBookDTO_Filter filter)
+            {
+                  var borrow = _dbContext.BorrowBooks
+                  .Include(x => x.Customers)
+                  .Include(x => x.Books).ThenInclude(x => x.CategoryBooks)
+                  .AsQueryable();
+
+                  if (!string.IsNullOrWhiteSpace(filter.BookName))
+                  {
+                        borrow = borrow.Where(x => x.Books.Name.Contains(filter.BookName));
+                  }
+                  borrow = borrow.Where(x => x.Customers.Name.Contains(filter.CusName));
+                  // borrow = borrow.Where(x => x.AdminId == filter.AdminId);
+
+
+
+                  // 2. Order => Order by
+                  if (!string.IsNullOrWhiteSpace(filter.OrderingField))
+                  {
+                        try
+                        {
+                              borrow = borrow.OrderBy($"{filter.OrderingField} {(filter.AscendingOrder ? "ascending" : "descending")}");
+                        }
+                        catch
+                        {
+                              return ResponseResultWithPagination.Failure<List<BorrowBookDTO_ToReturn>>($"Could not order by field: {filter.OrderingField}");
+                        }
+                  }
+
+                  var paginationResult = await _httpContext.HttpContext.InsertPaginationParametersInResponse(borrow, filter.RecordsPerPage, filter.Page);
+                  // var custom = await cus.Paginate(filter).ToListAsync();
+                  var result = _mapper.Map<List<BorrowBookDTO_ToReturn>>(await borrow.Paginate(filter).ToListAsync());
+                  return ResponseResultWithPagination.Success(result, paginationResult);
+            }
       }
 }

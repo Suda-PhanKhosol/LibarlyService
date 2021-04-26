@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using GitLibary.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NetCoreAPI_Template_v3_with_auth.Data;
@@ -22,7 +23,11 @@ namespace NetCoreAPI_Template_v3_with_auth.Controllers
             {
                   this._borrowBookService = borrowBookService;
             }
-
+            [HttpGet("SearchPagination")]
+            public async Task<IActionResult> SearchPagination([FromQuery] BorrowBookDTO_Filter filter)
+            {
+                  return Ok(await _borrowBookService.SearchPagination(filter));
+            }
             [HttpPost("AddBorrowBook")]
             public async Task<IActionResult> AddBorrowBook(BorrowBookDTO_ToCreate AddBorrowBook)
             {

@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "shrKfOiBQxUmpGVyBgPqAwKy3Ppt9ngRMgC062iTlRzWUrAo7l+ljzZkNMrwWlMlgrMXPsIOleMkE7CKJWWsqg==",
+  "dgSpecHash": "5N8VMxdehIKvk+q67afEWif0oFsgkqOG4xrfFk0L4AL0frN9iaOylicUryrmg0Y7UrHoJFBj1saau8UGRj0BkA==",
   "success": true,
   "projectFilePath": "D:\\Training\\TestProject\\GitLibary\\NetCoreAPI_Template_v3_with_auth.csproj",
   "expectedPackageFiles": [
@@ -104,7 +104,7 @@
     "C:\\Users\\admin\\.nuget\\packages\\system.io.filesystem\\4.3.0\\system.io.filesystem.4.3.0.nupkg.sha512",
     "C:\\Users\\admin\\.nuget\\packages\\system.io.filesystem.primitives\\4.3.0\\system.io.filesystem.primitives.4.3.0.nupkg.sha512",
     "C:\\Users\\admin\\.nuget\\packages\\system.linq\\4.3.0\\system.linq.4.3.0.nupkg.sha512",
-    "C:\\Users\\admin\\.nuget\\packages\\system.linq.dynamic.core\\1.2.7\\system.linq.dynamic.core.1.2.7.nupkg.sha512",
+    "C:\\Users\\admin\\.nuget\\packages\\system.linq.dynamic.core\\1.2.9\\system.linq.dynamic.core.1.2.9.nupkg.sha512",
     "C:\\Users\\admin\\.nuget\\packages\\system.linq.expressions\\4.1.0\\system.linq.expressions.4.1.0.nupkg.sha512",
     "C:\\Users\\admin\\.nuget\\packages\\system.net.nameresolution\\4.3.0\\system.net.nameresolution.4.3.0.nupkg.sha512",
     "C:\\Users\\admin\\.nuget\\packages\\system.net.primitives\\4.3.0\\system.net.primitives.4.3.0.nupkg.sha512",

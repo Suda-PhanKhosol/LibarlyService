@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using GitLibary.DTOs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -10,7 +11,8 @@ using NetCoreAPI_Template_v3_with_auth.Data;
 using NetCoreAPI_Template_v3_with_auth.DTOs.Admin;
 using NetCoreAPI_Template_v3_with_auth.Models;
 using mAdmin = NetCoreAPI_Template_v3_with_auth.Models.Admin;
-
+using System.Linq.Dynamic.Core;
+using NetCoreAPI_Template_v3_with_auth.Helpers;
 //Business logic 
 
 namespace NetCoreAPI_Template_v3_with_auth.Services.Admin
@@ -86,9 +88,35 @@ namespace NetCoreAPI_Template_v3_with_auth.Services.Admin
                   await _dbContext.SaveChangesAsync();
                   var admin = _dbContext.Admins.ToList();
                   return ResponseResult.Success(_mapper.Map<List<AdminDTO_ToReturn>>(admin));
+            }
 
+            public async Task<ServiceResponseWithPagination<List<AdminDTO_ToReturn>>> SearchPagination(AdminDTO_Filter filter)
+            {
+                  var admin = _dbContext.Admins.AsQueryable();
 
+                  if (!string.IsNullOrWhiteSpace(filter.Name))
+                  {
+                        admin = admin.Where(x => x.Name.Contains(filter.Name));
+                  }
+                  admin = admin.Where(x => x.Email.Contains(filter.Email));
 
+                  // 2. Order => Order by
+                  if (!string.IsNullOrWhiteSpace(filter.OrderingField))
+                  {
+                        try
+                        {
+                              admin = admin.OrderBy($"{filter.OrderingField} {(filter.AscendingOrder ? "ascending" : "descending")}");
+                        }
+                        catch
+                        {
+                              return ResponseResultWithPagination.Failure<List<AdminDTO_ToReturn>>($"Could not order by field: {filter.OrderingField}");
+                        }
+                  }
+
+                  var paginationResult = await _httpContext.HttpContext.InsertPaginationParametersInResponse(admin, filter.RecordsPerPage, filter.Page);
+                  // var custom = await cus.Paginate(filter).ToListAsync();
+                  var result = _mapper.Map<List<AdminDTO_ToReturn>>(await admin.Paginate(filter).ToListAsync());
+                  return ResponseResultWithPagination.Success(result, paginationResult);
             }
       }
 }

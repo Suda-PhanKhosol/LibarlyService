@@ -9,11 +9,15 @@ using System.Collections.Generic;
 using NetCoreAPI_Template_v3_with_auth.DTOs.CategoryBook;
 using NetCoreAPI_Template_v3_with_auth.Services.CategoryBook;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using GitLibary.DTOs;
 
 namespace NetCoreAPI_Template_v3_with_auth.Controllers
 {
       [ApiController]
       [Route("api/[controller]")]
+
+      // [Authorize]
       public class CategoryBookController : ControllerBase
       {
             private readonly ICategoryBook _categoryBookService;
@@ -21,6 +25,12 @@ namespace NetCoreAPI_Template_v3_with_auth.Controllers
             public CategoryBookController(ICategoryBook categoryBookService)
             {
                   this._categoryBookService = categoryBookService;
+            }
+            [HttpGet("SearchPaginate")]
+            public async Task<IActionResult> SearchPaginate([FromQuery] CategoryBookDTO_Filter filter)
+            {
+
+                  return Ok(await _categoryBookService.SearchPaginate(filter));
             }
 
             [HttpPost("AddCategoryBook")]
@@ -31,10 +41,14 @@ namespace NetCoreAPI_Template_v3_with_auth.Controllers
             }
 
             [HttpGet("GetAllCategoryBook")]
+            // [Authorize(Roles = "Manager")]
+
             public async Task<IActionResult> GetAllCategoryBook()
             {
                   return Ok(await _categoryBookService.GetAllCategoryBook());
             }
+
+
 
             [HttpGet("GetCategoryBookById")]
             public async Task<IActionResult> GetCategoryBookById(int Id)

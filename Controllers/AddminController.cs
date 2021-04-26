@@ -8,6 +8,7 @@ using System.Linq;
 using System.Collections.Generic;
 using NetCoreAPI_Template_v3_with_auth.Services.Admin;
 using System.Threading.Tasks;
+using GitLibary.DTOs;
 
 namespace NetCoreAPI_Template_v3_with_auth.Controllers
 {
@@ -23,6 +24,12 @@ namespace NetCoreAPI_Template_v3_with_auth.Controllers
                   _adminService = adminService;
             }
 
+
+            [HttpGet("SearchPagination")]
+            public async Task<IActionResult> SearchPagination([FromQuery] AdminDTO_Filter filter)
+            {
+                  return Ok(await _adminService.SearchPagination(filter));
+            }
 
             [HttpPost("AddAdmin")]
             public async Task<IActionResult> AddAdmin(AdminDTO_ToCreate Admin)

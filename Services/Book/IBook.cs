@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GitLibary.DTOs;
 using NetCoreAPI_Template_v3_with_auth.DTOs.Book;
 using NetCoreAPI_Template_v3_with_auth.Models;
 
@@ -12,5 +13,6 @@ namespace NetCoreAPI_Template_v3_with_auth.Services.Book
             Task<ServiceResponse<BookDTO_ToReturn>> GetBookById(int Id);
             Task<ServiceResponse<BookDTO_ToReturn>> UpdateBook(BookDTO_ToUpdate UpdateBook, int id);
             Task<ServiceResponse<List<BookDTO_ToReturn>>> DeleteBookrById(int Id);
+            Task<ServiceResponseWithPagination<List<BookDTO_ToReturn>>> SearchPagination(BookDTO_Filter filter);
       }
 }

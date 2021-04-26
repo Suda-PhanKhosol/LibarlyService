@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GitLibary.DTOs;
 using NetCoreAPI_Template_v3_with_auth.DTOs.Admin;
 using NetCoreAPI_Template_v3_with_auth.Models;
 
@@ -17,6 +18,7 @@ namespace NetCoreAPI_Template_v3_with_auth.Services.Admin
             Task<ServiceResponse<AdminDTO_ToReturn>> UpdateAdmin(AdminDTO_ToUpdate UpdateAdmin, int id);
 
             Task<ServiceResponse<List<AdminDTO_ToReturn>>> DeleteAdminById(int id);
+            Task<ServiceResponseWithPagination<List<AdminDTO_ToReturn>>> SearchPagination(AdminDTO_Filter filter);
 
       }
 }

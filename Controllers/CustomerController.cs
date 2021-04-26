@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using GitLibary.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using NetCoreAPI_Template_v3_with_auth.Data;
 using NetCoreAPI_Template_v3_with_auth.DTOs.Customer;
@@ -19,6 +20,11 @@ namespace NetCoreAPI_Template_v3_with_auth.Controllers
             public CustomerController(ICustomer customerService)
             {
                   this._customerService = customerService;
+            }
+            [HttpGet("SearchPagination")]
+            public async Task<IActionResult> SearchPagination([FromQuery] CustomerDTO_Filter filter)
+            {
+                  return Ok(await _customerService.SearchPagination(filter));
             }
 
             [HttpPost("CreateCustomer")]

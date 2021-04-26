@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using GitLibary.DTOs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -9,7 +10,8 @@ using NetCoreAPI_Template_v3_with_auth.Data;
 using NetCoreAPI_Template_v3_with_auth.DTOs.Book;
 using NetCoreAPI_Template_v3_with_auth.Models;
 using mBook = NetCoreAPI_Template_v3_with_auth.Models.Book;
-
+using System.Linq.Dynamic.Core;
+using NetCoreAPI_Template_v3_with_auth.Helpers;
 
 namespace NetCoreAPI_Template_v3_with_auth.Services.Book
 {
@@ -96,6 +98,40 @@ namespace NetCoreAPI_Template_v3_with_auth.Services.Book
                   await _dbContext.SaveChangesAsync();
                   return ResponseResult.Success(_mapper.Map<List<BookDTO_ToReturn>>(_dbContext.Books.ToList()));
 
+            }
+
+            public async Task<ServiceResponseWithPagination<List<BookDTO_ToReturn>>> SearchPagination(BookDTO_Filter filter)
+            {
+                  var book = _dbContext.Books.Include(x => x.CategoryBooks).AsQueryable();
+
+                  if (!string.IsNullOrWhiteSpace(filter.Name))
+                  {
+                        book = book.Where(x => x.Name.Contains(filter.Name));
+                  }
+                  book = book.Where(x => x.CategoryBooks.CodeType == filter.CategoryCode);
+
+                  book = book.Where(x => x.BorrowPrice >= filter.MinPrice);
+
+
+
+
+                  // 2. Order => Order by
+                  if (!string.IsNullOrWhiteSpace(filter.OrderingField))
+                  {
+                        try
+                        {
+                              book = book.OrderBy($"{filter.OrderingField} {(filter.AscendingOrder ? "ascending" : "descending")}");
+                        }
+                        catch
+                        {
+                              return ResponseResultWithPagination.Failure<List<BookDTO_ToReturn>>($"Could not order by field: {filter.OrderingField}");
+                        }
+                  }
+
+                  var paginationResult = await _httpContext.HttpContext.InsertPaginationParametersInResponse(book, filter.RecordsPerPage, filter.Page);
+                  // var custom = await cus.Paginate(filter).ToListAsync();
+                  var result = _mapper.Map<List<BookDTO_ToReturn>>(await book.Paginate(filter).ToListAsync());
+                  return ResponseResultWithPagination.Success(result, paginationResult);
             }
       }
 }

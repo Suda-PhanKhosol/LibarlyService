@@ -2,13 +2,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using GitLibary.DTOs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NetCoreAPI_Template_v3_with_auth.Data;
 using NetCoreAPI_Template_v3_with_auth.DTOs.Customer;
 using NetCoreAPI_Template_v3_with_auth.Models;
+using System.Linq.Dynamic.Core;
+
 using mCustomer = NetCoreAPI_Template_v3_with_auth.Models.Customer;
+using NetCoreAPI_Template_v3_with_auth.Helpers;
 
 namespace NetCoreAPI_Template_v3_with_auth.Services.Customer
 {
@@ -81,5 +85,35 @@ namespace NetCoreAPI_Template_v3_with_auth.Services.Customer
 
             }
 
+            public async Task<ServiceResponseWithPagination<List<CustomerDTO_ToRetun>>> SearchPagination(CustomerDTO_Filter filter)
+            {
+                  var cus = _dbContext.Customers.AsQueryable();
+
+                  if (!string.IsNullOrWhiteSpace(filter.Name))
+                  {
+                        cus = cus.Where(x => x.Name.Contains(filter.Name));
+                  }
+                  cus = cus.Where(x => x.Email.Contains(filter.Email));
+
+                  // 2. Order => Order by
+                  if (!string.IsNullOrWhiteSpace(filter.OrderingField))
+                  {
+                        try
+                        {
+                              cus = cus.OrderBy($"{filter.OrderingField} {(filter.AscendingOrder ? "ascending" : "descending")}");
+                        }
+                        catch
+                        {
+                              return ResponseResultWithPagination.Failure<List<CustomerDTO_ToRetun>>($"Could not order by field: {filter.OrderingField}");
+                        }
+                  }
+
+                  var paginationResult = await _httpContext.HttpContext.InsertPaginationParametersInResponse(cus, filter.RecordsPerPage, filter.Page);
+                  // var custom = await cus.Paginate(filter).ToListAsync();
+                  var result = _mapper.Map<List<CustomerDTO_ToRetun>>(await cus.Paginate(filter).ToListAsync());
+                  return ResponseResultWithPagination.Success(result, paginationResult);
+
+
+            }
       }
 }

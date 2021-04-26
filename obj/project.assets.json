@@ -1333,7 +1333,7 @@
           "lib/netstandard1.6/System.Linq.dll": {}
         }
       },
-      "System.Linq.Dynamic.Core/1.2.7": {
+      "System.Linq.Dynamic.Core/1.2.9": {
         "type": "package",
         "compile": {
           "lib/netcoreapp2.1/System.Linq.Dynamic.Core.dll": {}
@@ -4753,10 +4753,10 @@
         "system.linq.nuspec"
       ]
     },
-    "System.Linq.Dynamic.Core/1.2.7": {
-      "sha512": "5m38/z1CrZ6Ul+1fSLh0J1ij0MNmllppxHPF9IaBzoeTARQDtS7zM0mGMrYFCwpE2Ditx17gBPCv5YC95OhTSA==",
+    "System.Linq.Dynamic.Core/1.2.9": {
+      "sha512": "GjR4CCtIkiJSU6N8cidG4aa0ph+HBzFOq3uhLybuq4zjlKy3hjDrGbcEUeBiGpBmUrnUhTAJ5SCZGDoZS7d9SA==",
       "type": "package",
-      "path": "system.linq.dynamic.core/1.2.7",
+      "path": "system.linq.dynamic.core/1.2.9",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -4785,7 +4785,7 @@
         "lib/uap10.0.10240/System.Linq.Dynamic.Core.pdb",
         "lib/uap10.0.10240/System.Linq.Dynamic.Core.pri",
         "lib/uap10.0.10240/System.Linq.Dynamic.Core.xml",
-        "system.linq.dynamic.core.1.2.7.nupkg.sha512",
+        "system.linq.dynamic.core.1.2.9.nupkg.sha512",
         "system.linq.dynamic.core.nuspec"
       ]
     },
@@ -7139,7 +7139,7 @@
       "Serilog.Sinks.Async >= 1.4.0",
       "Serilog.Sinks.File >= 4.1.0",
       "Swashbuckle.AspNetCore >= 5.6.3",
-      "System.Linq.Dynamic.Core >= 1.2.7"
+      "System.Linq.Dynamic.Core >= 1.2.9"
     ]
   },
   "packageFolders": {
@@ -7233,7 +7233,7 @@
           },
           "System.Linq.Dynamic.Core": {
             "target": "Package",
-            "version": "[1.2.7, )"
+            "version": "[1.2.9, )"
           }
         },
         "imports": [

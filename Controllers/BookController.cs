@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using GitLibary.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NetCoreAPI_Template_v3_with_auth.Data;
@@ -20,6 +21,12 @@ namespace NetCoreAPI_Template_v3_with_auth.Controllers
             public BookController(IBook bookService)
             {
                   this._bookService = bookService;
+            }
+
+            [HttpGet("SearchPagination")]
+            public async Task<IActionResult> SearchPagination([FromQuery] BookDTO_Filter filter)
+            {
+                  return Ok(await _bookService.SearchPagination(filter));
             }
 
             [HttpPost("CreateBook")]

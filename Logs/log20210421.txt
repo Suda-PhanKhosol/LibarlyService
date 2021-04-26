@@ -437,3 +437,5 @@ Error Number:547,State:0,Class:16
    at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)
    at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
    at Microsoft.AspNetCore.Diagnostics.DeveloperExceptionPageMiddleware.Invoke(HttpContext context)
+2021-04-21 10:49:52.711 +07:00 [INF] Starting web host
+2021-04-21 15:46:34.442 +07:00 [INF] Starting web host
